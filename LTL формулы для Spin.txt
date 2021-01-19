@@ -1,0 +1,36 @@
+Безопасность:
+[]   ! (ns_green  && (sw_green  ||  wn_green))
+[]   ! (es_green  && sw_green)
+[]   ! (sw_green  && (es_green  ||  ns_green || wn_green))
+[]   ! (wn_green  && (ns_green  ||  sw_green))
+
+Живость:
+[]  ((ns_req  && ns_red)  -> <>  (ns_green))
+[]  ((es_req  && es_red)  -> <>  (es_green))
+[]  ((sw_req  && sw_red)  -> <>  (sw_green))
+[]  ((wn_req  && wn_red)  -> <>  (wn_green))
+
+
+Справедливасть:
+[]<>!(ns_green && ns_req)
+[]<>!(es_green && es_req)
+[]<>!(sw_green && sw_req)
+[]<>!(wn_green && wn_req)
+
+Определения:
+#define ns_green (NS_light == green)
+#define es_green (ES_light == green)
+#define sw_green (SW_light == green)
+#define wn_green (WN_light == green)
+
+#define ns_red	(NS_light == red)
+#define es_red	(ES_light == red)
+#define sw_red  (SW_light == red)
+#define wn_red	(WN_light == red)
+
+#define ns_req	(NS_req == true)
+#define es_req	(ES_req == true)
+#define sw_req	(SW_req == true)
+#define wn_req	(WN_req == true)
+
+

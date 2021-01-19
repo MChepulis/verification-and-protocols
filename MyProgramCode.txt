@@ -1,0 +1,135 @@
+mtype = {red, green};
+
+mtype NS_light = red;
+mtype ES_light = red;
+mtype SW_light = red;
+mtype WN_light = red;
+
+/* mutex */
+chan ES_SW_lock = [1] of {bool};
+chan NS_WN_lock = [1] of {bool};
+chan SW_WN_lock = [1] of {bool};
+chan NS_SW_lock = [1] of {bool};
+
+bool NS_detector_can_work = true;
+bool ES_detector_can_work = true;
+bool SW_detector_can_work = true;
+bool WN_detector_can_work = true;
+
+bool NS_req = false;
+bool ES_req = false;
+bool SW_req = false;
+bool WN_req = false;
+
+
+active proctype justice_adjuster(){
+do
+  :: ( !NS_detector_can_work || !ES_detector_can_work || !SW_detector_can_work || !WN_detector_can_work );
+     ( !NS_req && !ES_req && !SW_req && !WN_req );
+
+     NS_detector_can_work = true;
+     ES_detector_can_work = true;
+     SW_detector_can_work = true;
+     WN_detector_can_work = true;
+od;
+}
+
+/* detectors */
+active proctype NS_detector(){
+do
+  :: NS_req = true;
+     NS_detector_can_work = false;
+     (NS_detector_can_work);
+od;
+}
+
+
+active proctype ES_detector(){
+do
+  :: ES_req = true;
+     ES_detector_can_work = false;
+     (ES_detector_can_work);
+od;
+}
+
+
+active proctype SW_detector(){
+do
+  :: SW_req = true;
+     SW_detector_can_work = false;
+     (SW_detector_can_work);
+od;
+}
+
+
+active proctype WN_detector(){
+do
+  :: WN_req = true;
+     WN_detector_can_work = false;
+     (WN_detector_can_work);
+od;
+}
+
+/* controllers */
+active proctype NS_lighter_controller(){
+do
+  :: (NS_req) ->
+     NS_WN_lock ! true;
+     NS_SW_lock ! true;
+
+     NS_light = green;
+     NS_req = false;
+     NS_light = red;
+
+     NS_WN_lock ? true;
+     NS_SW_lock ? true;
+od;
+}
+
+
+active proctype ES_lighter_controller(){
+do
+  :: (ES_req) ->
+     ES_SW_lock ! true;
+
+     ES_light = green;
+     ES_req = false;
+     ES_light = red;
+
+     ES_SW_lock ? true;
+od;
+}
+
+
+active proctype SW_lighter_controller(){
+do
+  :: (SW_req) ->
+     ES_SW_lock ! true;
+     SW_WN_lock ! true;
+     NS_SW_lock ! true;
+
+     SW_light = green;
+     SW_req = false;
+     SW_light = red;
+
+     ES_SW_lock ? true;
+     SW_WN_lock ? true;
+     NS_SW_lock ? true;
+od;
+}
+
+
+active proctype WN_lighter_controller(){
+do
+  :: (WN_req) ->
+     NS_WN_lock ! true;
+     NS_SW_lock ! true;
+
+     WN_light = green;
+     WN_req = false;
+     WN_light = red;
+
+     NS_WN_lock ? true;
+     NS_SW_lock ? true;
+od;
+}
